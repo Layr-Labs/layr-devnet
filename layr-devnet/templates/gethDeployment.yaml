@@ -48,6 +48,10 @@ spec:
                   key: {{ $k }}
                   name: {{ $secretName}}
           {{- end }}
+{{- if .Values.geth.volumeMounts }}
+          volumeMounts:
+{{ toYaml .Values.geth.volumeMounts | indent 12 }}
+{{- end}}
         - name: init-execution
           image: {{ .Values.images.prysm.name }}:{{ .Values.images.prysm.tag }}
           imagePullPolicy: Always
