@@ -7,6 +7,7 @@ HTTP_PORT="${HTTP_PORT:-8545}"
 AUTH_RPC_PORT="${AUTH_RPC_PORT:-8551}"
 NODE_PORT="${NODE_PORT:-30303}"
 SYNC_MODE="${SYNC_MODE:-full}"
+ADDITIONAL_VARS="${ADDITIONAL_VARS:-}"
 
 # Function to store the validator secret in a file
 function store_secret {
@@ -63,28 +64,36 @@ function start_geth {
     exit 1
   fi
 
-  geth \
+  execCmd="geth \
     --identity geth \
     --datadir ${EXEC_DATADIR} \
     --http \
     --http.addr 0.0.0.0 \
     --http.port ${HTTP_PORT} \
     --http.api eth,net,web3 \
-    --http.corsdomain "*" \
-    --http.vhosts "*" \
+    --http.corsdomain '*' \
+    --http.vhosts '*' \
     --ws \
     --ws.addr 0.0.0.0 \
     --ws.api eth,net,web3 \
-    --ws.origins "*" \
+    --ws.origins '*' \
     --authrpc.addr 0.0.0.0 \
     --authrpc.port ${AUTH_RPC_PORT} \
-    --authrpc.vhosts "*" \
+    --authrpc.vhosts '*' \
     --port ${NODE_PORT} \
     --nodiscover \
     --syncmode ${SYNC_MODE} \
     --allow-insecure-unlock \
     --unlock ${VALIDATOR_ACCOUNT} \
     --password ${SECRET_FILE}
+  "
+
+    if [ ! -z "${ADDITIONAL_VARS}" ]
+    then
+        execCmd="${execCmd} ${ADDITIONAL_VARS}"
+    fi
+    echo $execCmd
+    eval $execCmd
 }
 
 store_secret
