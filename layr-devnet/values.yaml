@@ -72,7 +72,7 @@ geth:
     VALIDATOR_ACCOUNT: "0x6db1f3f7a368d5895256a5ba0bdb84d2a6c3bff7"
     EXEC_DATADIR: "/geth/data"
     SECRET_FILE: "/geth-secrets/geth-password/gethPassword"
-    GETH_AUTHRPC_JWTSECRET: "/geth-secrets/jwt-secret/jqtSecret"
+    GETH_AUTHRPC_JWTSECRET: "/geth-secrets/jwt-secret/jwtSecret"
     GENESIS_INPUT: "/layr-devnet/execution/genesis.json"
     GENESIS_OUTPUT: "/geth/data/genesis.json"
     GENESIS_FILE: "/geth/data/genesis.json"

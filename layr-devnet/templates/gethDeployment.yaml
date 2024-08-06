@@ -26,32 +26,6 @@ spec:
 {{- end }}
 {{- $secretName := .Values.common.secret.name }}
       initContainers:
-        - name: preboot
-          image: {{ .Values.images.prysm.name }}:{{ .Values.images.prysm.tag }}
-          imagePullPolicy: Always
-          command:
-            - "/bin/bash"
-          args:
-            - "-c"
-            - "sleep 300"
-          env:
-{{- if .Values.geth.env }}
-{{- range $k, $v := .Values.geth.env }}
-            - name: {{ $k }}
-              value: '{{ $v }}'
-{{- end }}
-{{- end }}
-          {{- range $k, $v := .Values.common.secret.values }}
-            - name: {{ template "formatEnvVarName" $k }}
-              valueFrom:
-                secretKeyRef:
-                  key: {{ $k }}
-                  name: {{ $secretName}}
-          {{- end }}
-{{- if .Values.geth.volumeMounts }}
-          volumeMounts:
-{{ toYaml .Values.geth.volumeMounts | indent 12 }}
-{{- end}}
         - name: init-execution
           image: {{ .Values.images.prysm.name }}:{{ .Values.images.prysm.tag }}
           imagePullPolicy: Always
