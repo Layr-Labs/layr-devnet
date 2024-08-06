@@ -9,9 +9,15 @@ NODE_PORT="${NODE_PORT:-30303}"
 SYNC_MODE="${SYNC_MODE:-full}"
 ADDITIONAL_VARS="${ADDITIONAL_VARS:-}"
 GETH_AUTHRPC_JWTSECRET="${GETH_AUTHRPC_JWTSECRET:-/tmp/jwt_secret.txt}"
+GENERATE_PASSWORD="${GENERATE_SECRET:-true}"
 
 # Function to store the validator secret in a file
 function store_secret {
+  if [ "${GENERATE_PASSWORD}" != "true" ]
+  then
+      echo 'Skipping password generation'
+      return
+  fi
   if [ -z "${VALIDATOR_SECRET}" ]
   then
     echo "VALIDATOR_SECRET is not set"

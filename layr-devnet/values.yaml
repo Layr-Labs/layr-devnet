@@ -71,6 +71,7 @@ geth:
   env:
     VALIDATOR_ACCOUNT: "0x6db1f3f7a368d5895256a5ba0bdb84d2a6c3bff7"
     EXEC_DATADIR: "/geth/data"
+    GENERATE_PASSWORD: "false"
     SECRET_FILE: "/geth-secrets/geth-password/gethPassword"
     GETH_AUTHRPC_JWTSECRET: "/geth-secrets/jwt-secret/jqtSecret"
     GENESIS_INPUT: "/layr-devnet/execution/genesis.json"
