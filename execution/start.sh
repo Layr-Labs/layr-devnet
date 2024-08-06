@@ -13,7 +13,7 @@ GENERATE_PASSWORD="${GENERATE_SECRET:-true}"
 
 # Function to store the validator secret in a file
 function store_secret {
-  if [ "${GENERATE_PASSWORD}" != "true" ]
+  if [[ "$(GENERATE_PASSWORD)" != "true" ]];
   then
       echo 'Skipping password generation'
       return

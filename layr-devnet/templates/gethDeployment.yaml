@@ -38,7 +38,7 @@ spec:
 {{- if .Values.geth.env }}
 {{- range $k, $v := .Values.geth.env }}
             - name: {{ $k }}
-              value: {{ $v }}
+              value: '{{ $v }}'
 {{- end }}
 {{- end }}
           {{- range $k, $v := .Values.common.secret.values }}
@@ -61,7 +61,7 @@ spec:
 {{- if .Values.geth.env }}
 {{- range $k, $v := .Values.geth.env }}
             - name: {{ $k }}
-              value: {{ $v }}
+              value: '{{ $v }}'
 {{- end }}
 {{- end }}
           {{- range $k, $v := .Values.common.secret.values }}
@@ -85,7 +85,7 @@ spec:
 {{- if .Values.geth.env }}
 {{- range $k, $v := .Values.geth.env }}
             - name: {{ $k }}
-              value: {{ $v }}
+              value: '{{ $v }}'
 {{- end }}
 {{- end }}
           {{- range $k, $v := .Values.common.secret.values }}
