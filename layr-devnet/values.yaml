@@ -77,6 +77,8 @@ geth:
     GENESIS_OUTPUT: "/geth/data/genesis.json"
     GENESIS_FILE: "/geth/data/genesis.json"
     CONFIG_FILE: "/layr-devnet/consensus/config.yml"
+    # not used by geth, so this will get thrown away after initialization
+    OUTPUT_SSZ: "/tmp/genesis.ssz"
   ports:
     http-rpc:
         containerPort: 8545

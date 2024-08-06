@@ -12,7 +12,7 @@ if [[ -f $GENESIS_OUTPUT && $OVERWRITE == "false" ]]; then
 fi
 
 rm $GENESIS_OUTPUT || true
-rm $OUTPUT_SSZ || tue
+rm $OUTPUT_SSZ || true
 
 mkdir -p "$(dirname $GENESIS_OUTPUT)" || true
 mkdir -p "$(dirname $OUTPUT_SSZ)" || true
