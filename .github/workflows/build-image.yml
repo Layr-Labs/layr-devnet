@@ -9,21 +9,67 @@ on:
     branches:
       - "*"
 jobs:
-  build:
+  build-geth:
+    # needs: test
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v3
-      -
-        name: Set up QEMU
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      -
-        name: Build
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build & push geth image
+        env:
+          REGISTRY: "767397703211.dkr.ecr.us-east-1.amazonaws.com"
+          REPOSITORY: ${{ github.event.repository.name }}/geth
+          IMAGE_TAG: ${{ github.sha }}
+          PLATFORMS: "linux/amd64"
         run: |
-             COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose build
+          if [[ $GITHUB_REF == refs/heads/master ]]; then
+            docker buildx build --platform $PLATFORMS -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest --push -f ./go-ethereum/Dockerfile ./go-ethereum
+          else
+            docker buildx build --platform $PLATFORMS -t $REGISTRY/$REPOSITORY:$IMAGE_TAG --push .
+          fi
+  build-prysm:
+    # needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build & push geth image
+        env:
+          REGISTRY: "767397703211.dkr.ecr.us-east-1.amazonaws.com"
+          REPOSITORY: ${{ github.event.repository.name }}/prysm
+          IMAGE_TAG: ${{ github.sha }}
+          PLATFORMS: "linux/amd64"
+        run: |
+          if [[ $GITHUB_REF == refs/heads/master ]]; then
+            docker buildx build --platform $PLATFORMS -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest --push ./prysm/Dockerfile ./prysm
+          else
+            docker buildx build --platform $PLATFORMS -t $REGISTRY/$REPOSITORY:$IMAGE_TAG --push .
+          fi
              
           
