@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.geth.name }}
+  labels:
+    name: {{ .Values.geth.name }}
+spec:
+  ports:
+{{- range $key, $port := .Values.geth.ports }}
+    - name: {{ $port.name }}
+      port: {{ $port.containerPort }}
+      targetPort: {{ $port.containerPort }}
+      protocol: {{ $port.protocol }}
+{{- end }}
+  clusterIP: None
+  selector:
+    app: {{ .Values.geth.name }}

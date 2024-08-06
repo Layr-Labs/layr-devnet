@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.common.chainConfig.name }}
+  namespace: {{ .Release.Namespace }}
+data:
+{{ toYaml .Values.common.chainConfig.values | indent 2 }}

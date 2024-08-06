@@ -1,8 +1,8 @@
 services:
   create-beacon-chain-genesis:
     build:
-      context: ./prysm
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./prysm/Dockerfile
     command:
       - prysmctl
       - testnet
@@ -32,8 +32,8 @@ services:
         EXEC_DATADIR: /home/alice/geth-1
     user: alice
     build:
-      context: ./go-ethereum
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./go-ethereum/Dockerfile
       args:
         HTTP_PORT: 8545
     ports:
@@ -48,7 +48,7 @@ services:
       - ./execution/init.sh:/execution/init.sh
       - ./execution/start.sh:/execution/start.sh      
       - ./execution/genesis.json:/execution/genesis.json      
-      - ./execution/UTC--2024-07-25T20-16-28.065935964Z--6db1f3f7a368d5895256a5ba0bdb84d2a6c3bff7:/home/alice/geth-1/keystore/UTC--2024-07-25T20-16-28.065935964Z--6db1f3f7a368d5895256a5ba0bdb84d2a6c3bff7
+      - ./execution/validator-account-6db1f3f7a368d5895256a5ba0bdb84d2a6c3bff7.json:/home/alice/geth-1/keystore/validator-account-6db1f3f7a368d5895256a5ba0bdb84d2a6c3bff7.json
     networks:
       - devnet-net
     depends_on:
@@ -78,8 +78,8 @@ services:
       - --verbosity=warn
     user: victor
     build:
-      context: ./prysm
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./prysm/Dockerfile
     ports:
       - "3500:3500"
       - "4000:4000"
@@ -107,8 +107,8 @@ services:
       - --verbosity=warn
     user: victor
     build:
-      context: ./prysm
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./prysm/Dockerfile
     ports:
       - "7000:7000"
       - "7500:7500"

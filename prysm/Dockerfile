@@ -36,7 +36,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
   apt update && \
   apt install -y -q --no-install-recommends \
     ca-certificates apt-transport-https \
-    curl && \
+    curl vim && \
   apt clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -50,6 +50,8 @@ COPY --from=go-builder /usr/local/bin/prysmctl /usr/local/bin/prysmctl
 RUN useradd --create-home -s /bin/bash -u 1001 -U victor
 RUN usermod -a -G sudo victor
 RUN echo '%victor ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+COPY . /layr-devnet
 
 VOLUME ["/home/alice"]
 VOLUME ["/home/victor"]

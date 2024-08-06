@@ -9,7 +9,8 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
   apt clean && \
     rm -rf /var/lib/apt/lists/*
 
-COPY ./install-geth.sh /go-ethereum/install-geth.sh
+COPY ./go-ethereum/install-geth.sh /go-ethereum/install-geth.sh
+
 WORKDIR /go-ethereum
 RUN /go-ethereum/install-geth.sh
 
@@ -27,6 +28,8 @@ LABEL org.label-schema.name="layr-devnet" \
 
 VOLUME ["/home/alice"]
 WORKDIR /home/alice
+
+COPY . /layr-devnet
 
 RUN chown -R alice:alice /home/alice
 
