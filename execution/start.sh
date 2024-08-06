@@ -2,11 +2,11 @@
 
 set -e
 
-SECRET_FILE=/tmp/validator_secret.${RANDOM}.txt
-HTTP_PORT=8545
-AUTH_RPC_PORT=8551
-NODE_PORT=30303
-SYNC_MODE=full
+SECRET_FILE="${SECRET_FILE:-/tmp/validator_secret.${RANDOM}.txt}"
+HTTP_PORT="${HTTP_PORT:-8545}"
+AUTH_RPC_PORT="${AUTH_RPC_PORT:-8551}"
+NODE_PORT="${NODE_PORT:-30303}"
+SYNC_MODE="${SYNC_MODE:-full}"
 
 # Function to store the validator secret in a file
 function store_secret {
