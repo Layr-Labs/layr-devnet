@@ -14,6 +14,9 @@ fi
 rm $GENESIS_OUTPUT || true
 rm $OUTPUT_SSZ || tue
 
+mkdir -p "$(dirname $GENESIS_OUTPUT)" || true
+mkdir -p "$(dirname $OUTPUT_SSZ)" || true
+
 prysmctl testnet generate-genesis \
     --fork=capella \
     --num-validators=64 \

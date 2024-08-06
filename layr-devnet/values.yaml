@@ -70,11 +70,11 @@ geth:
     node-role.kubernetes.io/general: general
   env:
     VALIDATOR_ACCOUNT: "0x6db1f3f7a368d5895256a5ba0bdb84d2a6c3bff7"
-    EXEC_DATADIR: "/data/data"
+    EXEC_DATADIR: "/geth/data"
     SECRET_FILE: "/geth-secrets/geth-password/gethPassword"
     GETH_AUTHRPC_JWTSECRET: "/geth-secrets/jwt-secret/jqtSecret"
     GENESIS_INPUT: "/layr-devnet/execution/genesis.json"
-    GENESIS_OUTPUT: "/data/data/genesis.json"
+    GENESIS_OUTPUT: "/geth/data/genesis.json"
     GENESIS_FILE: "/geth/data/genesis.json"
     CONFIG_FILE: "/layr-devnet/consensus/config.yml"
   ports:
@@ -113,7 +113,7 @@ geth:
           name: layr-devnet-chain-config
   volumeMounts:
     - name: geth-data
-      mountPath: /data
+      mountPath: /geth
     - name: jwt-secret
       mountPath: /geth-secrets/jwt-secret
       readOnly: true
