@@ -11,7 +11,8 @@ if [[ -f $GENESIS_OUTPUT && $OVERWRITE == "false" ]]; then
     exit 0
 fi
 
-rm $GENESIS_OUTPUT $OUTPUT_SSZ
+rm $GENESIS_OUTPUT || true
+rm $OUTPUT_SSZ || tue
 
 prysmctl testnet generate-genesis \
     --fork=capella \

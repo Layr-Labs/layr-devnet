@@ -24,13 +24,16 @@ spec:
       nodeSelector:
 {{ toYaml .Values.geth.nodeSelector | indent 8 }}
 {{- end }}
-{{- $secretName := .Values.common.secret.name -}}
+{{- $secretName := .Values.common.secret.name }}
       initContainers:
-        - name: init-execution
-          image: {{ .Values.geth.image.name }}:{{ .Values.geth.image.tag }}
+        - name: preboot
+          image: {{ .Values.images.prysm.name }}:{{ .Values.images.prysm.tag }}
           imagePullPolicy: Always
           command:
-            - "/execution/init.sh"
+            - "/bin/bash"
+          args:
+            - "-c"
+            - "sleep 300"
           env:
 {{- if .Values.geth.env }}
 {{- range $k, $v := .Values.geth.env }}
@@ -44,13 +47,36 @@ spec:
                 secretKeyRef:
                   key: {{ $k }}
                   name: {{ $secretName}}
-          {{- end -}}
+          {{- end }}
+        - name: init-execution
+          image: {{ .Values.images.prysm.name }}:{{ .Values.images.prysm.tag }}
+          imagePullPolicy: Always
+          command:
+            - "/layr-devnet/execution/initGenesis.sh"
+          env:
+{{- if .Values.geth.env }}
+{{- range $k, $v := .Values.geth.env }}
+            - name: {{ $k }}
+              value: {{ $v }}
+{{- end }}
+{{- end }}
+          {{- range $k, $v := .Values.common.secret.values }}
+            - name: {{ template "formatEnvVarName" $k }}
+              valueFrom:
+                secretKeyRef:
+                  key: {{ $k }}
+                  name: {{ $secretName}}
+          {{- end }}
+{{- if .Values.geth.volumeMounts }}
+          volumeMounts:
+{{ toYaml .Values.geth.volumeMounts | indent 12 }}
+{{- end}}
       containers:
         - name: geth
-          image: {{ .Values.geth.image.name }}:{{ .Values.geth.image.tag }}
+          image: {{ .Values.images.geth.name }}:{{ .Values.images.geth.tag }}
           imagePullPolicy: Always
           command:
-            - "/execution/start.sh"
+            - "/layr-devnet/execution/start.sh"
           env:
 {{- if .Values.geth.env }}
 {{- range $k, $v := .Values.geth.env }}
@@ -65,7 +91,23 @@ spec:
                   key: {{ $k }}
                   name: {{ $secretName}}
           {{- end -}}
+{{- if .Values.geth.volumeMounts }}
+          volumeMounts:
+{{ toYaml .Values.geth.volumeMounts | indent 12 }}
+{{- end}}
 {{- if .Values.geth.resources }}
           resources:
 {{ toYaml .Values.geth.resources | indent 12 }}
+{{- end}}
+          ports:
+{{- if .Values.geth.ports }}
+{{- range $k, $v := .Values.geth.ports }}
+            - containerPort: {{ $v.containerPort }}
+              name: {{ $v.name }}
+              protocol: {{ $v.protocol }}
+{{- end }}
+{{- end }}
+{{- if .Values.geth.volumes }}
+      volumes:
+{{ toYaml .Values.geth.volumes | indent 8 }}
 {{- end}}

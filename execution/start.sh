@@ -8,6 +8,7 @@ AUTH_RPC_PORT="${AUTH_RPC_PORT:-8551}"
 NODE_PORT="${NODE_PORT:-30303}"
 SYNC_MODE="${SYNC_MODE:-full}"
 ADDITIONAL_VARS="${ADDITIONAL_VARS:-}"
+GETH_AUTHRPC_JWTSECRET="${GETH_AUTHRPC_JWTSECRET:-/tmp/jwt_secret.txt}"
 
 # Function to store the validator secret in a file
 function store_secret {
@@ -85,7 +86,8 @@ function start_geth {
     --syncmode ${SYNC_MODE} \
     --allow-insecure-unlock \
     --unlock ${VALIDATOR_ACCOUNT} \
-    --password ${SECRET_FILE}
+    --password ${SECRET_FILE} \
+    --authrpc.jwtsecret ${GETH_AUTHRPC_JWTSECRET} \
   "
 
     if [ ! -z "${ADDITIONAL_VARS}" ]

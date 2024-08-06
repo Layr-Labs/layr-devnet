@@ -1,8 +1,8 @@
 services:
   create-beacon-chain-genesis:
     build:
-      context: ./prysm
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./Dockerfile
     command:
       - prysmctl
       - testnet
@@ -32,8 +32,8 @@ services:
         EXEC_DATADIR: /home/alice/geth-1
     user: alice
     build:
-      context: ./go-ethereum
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./go-ethereum/Dockerfile
       args:
         HTTP_PORT: 8545
     ports:
@@ -78,8 +78,8 @@ services:
       - --verbosity=warn
     user: victor
     build:
-      context: ./prysm
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./prysm/Dockerfile
     ports:
       - "3500:3500"
       - "4000:4000"
@@ -107,8 +107,8 @@ services:
       - --verbosity=warn
     user: victor
     build:
-      context: ./prysm
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./prysm/Dockerfile
     ports:
       - "7000:7000"
       - "7500:7500"

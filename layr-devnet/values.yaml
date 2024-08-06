@@ -1,13 +1,57 @@
 common:
+  chainConfig:
+    name: "layr-devnet-chain-config"
+    values:
+      config.yml: |
+        CONFIG_NAME: layr-devnet
+        PRESET_BASE: interop
+
+        # Genesis
+        GENESIS_FORK_VERSION: 0x20000089
+
+        # Altair
+        ALTAIR_FORK_EPOCH: 0
+        ALTAIR_FORK_VERSION: 0x20000090
+
+        # Merge
+        BELLATRIX_FORK_EPOCH: 0
+        BELLATRIX_FORK_VERSION: 0x20000091
+        TERMINAL_TOTAL_DIFFICULTY: 0
+
+        # Capella
+        CAPELLA_FORK_EPOCH: 0
+        CAPELLA_FORK_VERSION: 0x20000092
+        MAX_WITHDRAWALS_PER_PAYLOAD: 16
+
+        DENEB_FORK_VERSION: 0x20000093
+
+        # Time parameters
+        SECONDS_PER_SLOT: 2
+        SLOTS_PER_EPOCH: 6
+
+        # Deposit contract
+        DEPOSIT_CONTRACT_ADDRESS: 0x4242424242424242424242424242424242424242
+  jwtSecret:
+    name: "layr-devnet-jwt-secret"
+    values:
+      jwtSecret: ""
+  gethPassword:
+    name: "layr-devnet-geth-password"
+    values:
+      gethPassword: ""
   secret:
-    name: 'layr-devnet-secret'
+    name: "layr-devnet-secret"
     values:
       VALIDATOR_SECRET: ""
-geth:
-  name: geth
-  image:
+images:
+  geth:
     name: "767397703211.dkr.ecr.us-east-1.amazonaws.com/layr-devnet/geth"
     tag: "latest"
+  prysm:
+    name: "767397703211.dkr.ecr.us-east-1.amazonaws.com/layr-devnet/prysm"
+    tag: "latest"
+geth:
+  name: geth
   updateStrategy:
     replicas: 1
     strategy:
@@ -21,10 +65,62 @@ geth:
     limits:
       memory: 4Gi
       cpu: 1
-  serviceAccountName: "layr-devnet-pods"
-  nodeSelector: {}
+  serviceAccountName: ""
+  nodeSelector:
+    node-role.kubernetes.io/general: general
   env:
-    VALIDATOR_ACCOUNT: ""
+    VALIDATOR_ACCOUNT: "0x6db1f3f7a368d5895256a5ba0bdb84d2a6c3bff7"
+    EXEC_DATADIR: "/geth/data"
+    SECRET_FILE: "/geth-secrets/geth-password/gethPassword"
+    GETH_AUTHRPC_JWTSECRET: "/geth-secrets/jwt-secret/jqtSecret"
+    GENESIS_OUTPUT: "/geth/data/genesis.json"
+    GENESIS_FILE: "/geth/data/genesis.json"
+    CONFIG_FILE: "/layr-devnet/consensus/config.yml"
+  ports:
+    http-rpc:
+        containerPort: 8545
+        name: http-rpc
+        protocol: TCP
+    ws-rpc:
+        containerPort: 8546
+        name: ws-rpc
+        protocol: TCP
+    auth-rpc:
+        containerPort: 8551
+        name: auth-rpc
+        protocol: TCP
+    p2p-tcp:
+        containerPort: 30303
+        name: p2p-tcp
+        protocol: TCP
+    p2p-udp:
+        containerPort: 30303
+        name: p2p-udp
+        protocol: UDP
+  volumes:
+    - name: geth-data
+      persistentVolumeClaim:
+        claimName: geth-data
+    - name: jwt-secret
+      secret:
+        secretName: layr-devnet-jwt-secret
+    - name: geth-password
+      secret:
+        secretName: layr-devnet-geth-password
+    - name: chain-config
+      configMap:
+          name: layr-devnet-chain-config
+  volumeMounts:
+    - name: geth-data
+      mountPath: /geth
+    - name: jwt-secret
+      mountPath: /geth-secrets/jwt-secret
+      readOnly: true
+    - name: geth-password
+      mountPath: /geth-secrets/geth-password
+      readOnly: true
+    - name: chain-config
+      mountPath: /config
 beaconChain:
   name: beacon-chain
   image:
