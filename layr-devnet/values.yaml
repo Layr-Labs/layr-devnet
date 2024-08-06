@@ -1,0 +1,49 @@
+common:
+  secret:
+    name: 'layr-devnet-secret'
+    values:
+      VALIDATOR_SECRET: ""
+geth:
+  name: geth
+  image:
+    name: "767397703211.dkr.ecr.us-east-1.amazonaws.com/layr-devnet/geth"
+    tag: "latest"
+  updateStrategy:
+    replicas: 1
+    strategy:
+      rollingUpdate:
+        maxUnavailable: 0
+        maxSurge: 1
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: .6
+    limits:
+      memory: 4Gi
+      cpu: 1
+  serviceAccountName: "layr-devnet-pods"
+  nodeSelector: {}
+  env:
+    VALIDATOR_ACCOUNT: ""
+beaconChain:
+  name: beacon-chain
+  image:
+    name: "767397703211.dkr.ecr.us-east-1.amazonaws.com/layr-devnet/beacon-chain"
+    tag: "latest"
+  updateStrategy:
+    replicas: 1
+    strategy:
+      rollingUpdate:
+        maxUnavailable: 0
+        maxSurge: 1
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: .6
+    limits:
+      memory: 4Gi
+      cpu: 1
+  serviceAccountName: "layr-devnet-pods"
+  nodeSelector: {}
+  env: {}
+
