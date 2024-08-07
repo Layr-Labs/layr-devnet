@@ -62,7 +62,7 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
           PLATFORMS: "linux/amd64"
         run: |
-          docker buildx build --platform $PLATFORMS -t $REGISTRY/$REPOSITORY:$IMAGE_TAG --push ./prysm/Dockerfile .
+          docker buildx build --platform $PLATFORMS -t $REGISTRY/$REPOSITORY:$IMAGE_TAG --push -f ./prysm/Dockerfile .
   deploy:
     needs: [build-geth, build-prysm]
     runs-on: ubuntu-latest
