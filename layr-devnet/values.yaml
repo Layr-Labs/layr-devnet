@@ -173,4 +173,16 @@ beaconChain:
     - name: chain-config
       configMap:
         name: layr-devnet-chain-config
-
+  ports:
+    json-rpc:
+        containerPort: 3500
+        name: json-rpc
+        protocol: TCP
+    grpc:
+        containerPort: 4000
+        name: grpc
+        protocol: TCP
+    p2p:
+        containerPort: 13000
+        name: p2p
+        protocol: TCP
