@@ -1,0 +1,229 @@
+common:
+  chainConfig:
+    name: "layr-devnet-chain-config"
+    values:
+      config.yml: |
+        CONFIG_NAME: layr-devnet
+        PRESET_BASE: interop
+
+        # Genesis
+        GENESIS_FORK_VERSION: 0x20000089
+
+        # Altair
+        ALTAIR_FORK_EPOCH: 0
+        ALTAIR_FORK_VERSION: 0x20000090
+
+        # Merge
+        BELLATRIX_FORK_EPOCH: 0
+        BELLATRIX_FORK_VERSION: 0x20000091
+        TERMINAL_TOTAL_DIFFICULTY: 0
+
+        # Capella
+        CAPELLA_FORK_EPOCH: 0
+        CAPELLA_FORK_VERSION: 0x20000092
+        MAX_WITHDRAWALS_PER_PAYLOAD: 16
+
+        DENEB_FORK_VERSION: 0x20000093
+
+        # Time parameters
+        SECONDS_PER_SLOT: 2
+        SLOTS_PER_EPOCH: 6
+
+        # Deposit contract
+        DEPOSIT_CONTRACT_ADDRESS: 0x4242424242424242424242424242424242424242
+  jwtSecret:
+    name: "layr-devnet-jwt-secret"
+    values:
+      jwtSecret: ""
+  gethKeys:
+    name: "layr-devnet-geth-keys"
+    values:
+      defaultAccount: ''
+  gethPassword:
+    name: "layr-devnet-geth-password"
+    values:
+      gethPassword: ""
+  secret:
+    name: "layr-devnet-secret"
+    values:
+      VALIDATOR_SECRET: ""
+images:
+  geth:
+    name: "767397703211.dkr.ecr.us-east-1.amazonaws.com/layr-devnet/geth"
+    tag: "latest"
+  prysm:
+    name: "767397703211.dkr.ecr.us-east-1.amazonaws.com/layr-devnet/prysm"
+    tag: "latest"
+geth:
+  name: geth
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: .6
+    limits:
+      memory: 4Gi
+      cpu: 1
+  serviceAccountName: ""
+  nodeSelector:
+    node-role.kubernetes.io/general: general
+  env:
+    VALIDATOR_ACCOUNT: "0x6db1f3f7a368d5895256a5ba0bdb84d2a6c3bff7"
+    EXEC_DATADIR: "/geth/data"
+    SECRET_FILE: "/geth-secrets/geth-password/gethPassword"
+    GETH_AUTHRPC_JWTSECRET: "/geth-secrets/jwt-secret/jwtSecret"
+    GENESIS_INPUT: "/layr-devnet/execution/genesis.json"
+    GENESIS_OUTPUT: "/geth/data/genesis.json"
+    GENESIS_FILE: "/geth/data/genesis.json"
+    CONFIG_FILE: "/layr-devnet/consensus/config.yml"
+    OUTPUT_SSZ: "/tmp/genesis.ssz"
+    GENERATE_PASSWORD: "false"
+    KEYSTORE_SOURCE_DIR: "/geth-keys"
+  ports:
+    http-rpc:
+        containerPort: 8545
+        name: http-rpc
+        protocol: TCP
+    ws-rpc:
+        containerPort: 8546
+        name: ws-rpc
+        protocol: TCP
+    auth-rpc:
+        containerPort: 8551
+        name: auth-rpc
+        protocol: TCP
+    p2p-tcp:
+        containerPort: 30303
+        name: p2p-tcp
+        protocol: TCP
+    p2p-udp:
+        containerPort: 30303
+        name: p2p-udp
+        protocol: UDP
+  volumes:
+    - name: geth-data
+      persistentVolumeClaim:
+        claimName: geth-data-claim
+    - name: jwt-secret
+      secret:
+        secretName: layr-devnet-jwt-secret
+    - name: geth-password
+      secret:
+        secretName: layr-devnet-geth-password
+    - name: chain-config
+      configMap:
+          name: layr-devnet-chain-config
+    - name: geth-keys
+      secret:
+        secretName: layr-devnet-geth-keys
+  volumeMounts:
+    - name: geth-data
+      mountPath: /geth
+    - name: geth-keys
+      mountPath: /geth-keys
+      readOnly: true
+    - name: jwt-secret
+      mountPath: /geth-secrets/jwt-secret
+      readOnly: true
+    - name: geth-password
+      mountPath: /geth-secrets/geth-password
+      readOnly: true
+    - name: chain-config
+      mountPath: /config
+beaconChain:
+  name: beacon-chain
+  image:
+    name: "767397703211.dkr.ecr.us-east-1.amazonaws.com/layr-devnet/beacon-chain"
+    tag: "latest"
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: .6
+    limits:
+      memory: 4Gi
+      cpu: 1
+  serviceAccountName: ""
+  nodeSelector:
+    node-role.kubernetes.io/general: general
+  env:
+    # init genesis variables
+    CONFIG_FILE: "/layr-devnet/consensus/config.yml"
+    GENESIS_INPUT: "/layr-devnet/execution/genesis.json"
+    GENESIS_OUTPUT: "/tmp/genesis.json"
+    OUTPUT_SSZ: "/beacon-chain/genesis.ssz"
+    # runtime variables
+    DATA_DIR: "/beacon-chain/beacon-chain"
+    SLASHER_DIR: "/beacon-chain/slasher"
+    GENESIS_FILE: "/beacon-chain/genesis.ssz"
+    CHAIN_CONFIG_FILE: "/config/config.yml"
+    JWT_SECRET: "/beacon-chain-secrets/jwt-secret/jwtSecret"
+  volumeMounts:
+    - name: jwt-secret
+      mountPath: /beacon-chain-secrets/jwt-secret
+    - name: beacon-chain-data
+      mountPath: /beacon-chain
+    - name: chain-config
+      mountPath: /config
+  volumes:
+    - name: beacon-chain-data
+      persistentVolumeClaim:
+        claimName: beacon-chain-data
+    - name: jwt-secret
+      secret:
+        secretName: layr-devnet-jwt-secret
+    - name: chain-config
+      configMap:
+        name: layr-devnet-chain-config
+  ports:
+    json-rpc:
+        containerPort: 3500
+        name: json-rpc
+        protocol: TCP
+    grpc:
+        containerPort: 4000
+        name: grpc
+        protocol: TCP
+    p2p:
+        containerPort: 13000
+        name: p2p
+        protocol: TCP
+validator:
+  name: validator
+  image:
+    name: "767397703211.dkr.ecr.us-east-1.amazonaws.com/layr-devnet/beacon-chain"
+    tag: "latest"
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: .6
+    limits:
+      memory: 4Gi
+      cpu: 1
+  serviceAccountName: ""
+  nodeSelector:
+    node-role.kubernetes.io/general: general
+  env:
+    # runtime variables
+    DATA_DIR: "/validator-data"
+    BEACON_RPC_PROVIDER: "beacon-chain:3500"
+    CHAIN_CONFIG_FILE: "/config/config.yml"
+  volumeMounts:
+    - name: validator-data
+      mountPath: /validator-data
+    - name: chain-config
+      mountPath: /config
+  volumes:
+    - name: validator-data
+      persistentVolumeClaim:
+        claimName: validator-data
+    - name: chain-config
+      configMap:
+        name: layr-devnet-chain-config
+  ports:
+    rpc:
+      containerPort: 7000
+      name: json-rpc
+      protocol: TCP
+    grpc:
+      containerPort: 7500
+      name: grpc
+      protocol: TCP

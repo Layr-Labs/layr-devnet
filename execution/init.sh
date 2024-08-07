@@ -2,7 +2,7 @@
 
 set -e
 
-GENESIS_FILE=/execution/genesis.json
+GENESIS_FILE="${GENESIS_FILE:-/execution/genesis.json}"
 
 function remove_db {
     if [ -z "${EXEC_DATADIR}" ]

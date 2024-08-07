@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.beaconChain.name }}
+  labels:
+    name: {{ .Values.beaconChain.name }}
+spec:
+  ports:
+{{- range $key, $port := .Values.beaconChain.ports }}
+    - name: {{ $port.name }}
+      port: {{ $port.containerPort }}
+      targetPort: {{ $port.containerPort }}
+      protocol: {{ $port.protocol }}
+{{- end }}
+  clusterIP: None
+  selector:
+    app: {{ .Values.beaconChain.name }}

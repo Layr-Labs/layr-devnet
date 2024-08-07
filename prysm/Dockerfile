@@ -51,6 +51,8 @@ RUN useradd --create-home -s /bin/bash -u 1001 -U victor
 RUN usermod -a -G sudo victor
 RUN echo '%victor ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
+COPY . /layr-devnet
+
 VOLUME ["/home/alice"]
 VOLUME ["/home/victor"]
 WORKDIR /home/victor
