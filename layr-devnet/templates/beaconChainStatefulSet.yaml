@@ -56,7 +56,7 @@ spec:
           command: ["/bin/bash"]
           args:
             - "-c"
-            - "sleep 15"
+            - "sleep 30"
           env:
 {{- if .Values.beaconChain.env }}
 {{- range $k, $v := .Values.beaconChain.env }}
