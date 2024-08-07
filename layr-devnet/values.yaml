@@ -56,12 +56,6 @@ images:
     tag: "latest"
 geth:
   name: geth
-  updateStrategy:
-    replicas: 1
-    strategy:
-      rollingUpdate:
-        maxUnavailable: 0
-        maxSurge: 1
   resources:
     requests:
       memory: 1Gi

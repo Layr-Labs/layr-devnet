@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -x
-
 json_string=$(echo '{"address":"6db1f3f7a368d5895256a5ba0bdb84d2a6c3bff7","crypto":{"cipher":"aes-128-ctr","ciphertext":"153449b35b81a31cbebad447e8c3f817b5ad9becf2957785c71a8cdefd974a3f","cipherparams":{"iv":"53d6da17d0469c2b02427dd29d00dfe0"},"kdf":"scrypt","kdfparams":{"dklen":32,"n":262144,"p":1,"r":8,"salt":"6b84899c2fbadfe3b5e15ef72921b45bddd9a2ed69e87adba2788f36e0036723"},"mac":"12ad7e87f7c5a88706e89b8f2d762a4984e2a24cc2565f272123e229392550ee"},"id":"16eb1704-3e32-480b-9502-75fa72e044c1","version":3}' | base64)
 
 helm --kube-context=protocol-preprod upgrade --install \

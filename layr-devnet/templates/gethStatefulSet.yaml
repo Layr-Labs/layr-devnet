@@ -1,15 +1,16 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ template "gethDeploymentName" . }}
   namespace: {{ .Release.Namespace }}
   labels:
     app: {{ template "gethDeploymentName" . }}
 spec:
+  serviceName: {{ template "gethDeploymentName" . }}
+  replicas: 1
   selector:
     matchLabels:
       app: {{ template "gethDeploymentName" . }}
-{{ toYaml .Values.geth.updateStrategy | indent 2 }}
   template:
     metadata:
       labels:
@@ -112,3 +113,13 @@ spec:
       volumes:
 {{ toYaml .Values.geth.volumes | indent 8 }}
 {{- end}}
+  volumeClaimTemplates:
+    - metadata:
+        name: geth-data
+      spec:
+        accessModes:
+          - ReadWriteMany
+        storageClassName: efs
+        resources:
+          requests:
+            storage: 10Gi
