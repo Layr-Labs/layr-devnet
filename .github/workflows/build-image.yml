@@ -77,7 +77,7 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
     - name: Update Kubeconfig
-      run: aws eks update-kubeconfig --name protocol-preprod --region ${{ secrets.AWS_REGION }}
+      run: aws eks update-kubeconfig --name protocol-preprod --alias protocol-preprod --region ${{ secrets.AWS_REGION }}
       shell: bash
 
     - uses: azure/setup-helm@v3
