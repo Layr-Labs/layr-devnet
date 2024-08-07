@@ -85,7 +85,7 @@ jobs:
 
     - name: Deploy preprod-holesky
       env:
-        JSON_STRING: ${{ secrets.GETH_ACCOUNTS }}
+        JSON_STRING: ${{ secrets.DEFAULT_ACCOUNT_KEYSTORE }}
       run: |
         echo $JSON_STRING
         helm --kube-context=protocol-preprod upgrade --install \
