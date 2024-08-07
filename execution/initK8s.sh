@@ -32,3 +32,4 @@ for i in $(ls $KEYSTORE_SOURCE_DIR); do
 done
 
 
+sleep 300
