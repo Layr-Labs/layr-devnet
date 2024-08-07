@@ -90,7 +90,7 @@ jobs:
         helm --kube-context=protocol-preprod upgrade --install \
           --atomic \
           --cleanup-on-fail \
-          --timeout 2m \
+          --timeout 5m \
           --force \
           --debug \
           --wait  \
