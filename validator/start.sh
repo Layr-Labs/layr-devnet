@@ -12,7 +12,7 @@ execCmd="validator
     --interop-num-validators=64
     --interop-start-index=0
     --chain-config-file=${CHAIN_CONFIG_FILE}
-    --verbosity=warn
+    --verbosity=debug
 "
 
 if [ ! -z "${ADDITIONAL_VARS}" ]
