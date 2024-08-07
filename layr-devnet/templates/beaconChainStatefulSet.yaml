@@ -53,10 +53,8 @@ spec:
         - name: wait-for-geth
           image: {{ .Values.images.prysm.name }}:{{ .Values.images.prysm.tag }}
           imagePullPolicy: Always
-          command: ["/bin/bash"]
-          args:
-            - "-c"
-            - "sleep 30"
+          command:
+            - "/layr-devnet/consensus/waitForGeth.sh"
           env:
 {{- if .Values.beaconChain.env }}
 {{- range $k, $v := .Values.beaconChain.env }}

@@ -157,6 +157,7 @@ beaconChain:
     CHAIN_CONFIG_FILE: "/config/config.yml"
     JWT_SECRET: "/beacon-chain-secrets/jwt-secret/jwtSecret"
     GETH_ENDPOINT: "http://geth-node:8551"
+    GETH_RPC_ENDPOINT: "http://geth-node:8545"
   volumeMounts:
     - name: jwt-secret
       mountPath: /beacon-chain-secrets/jwt-secret
