@@ -38,7 +38,7 @@ common:
   gethKeys:
     name: "layr-devnet-geth-keys"
     values:
-      default-account: ''
+      defaultAccount: ''
   gethPassword:
     name: "layr-devnet-geth-password"
     values:

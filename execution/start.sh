@@ -11,8 +11,6 @@ ADDITIONAL_VARS="${ADDITIONAL_VARS:-}"
 GETH_AUTHRPC_JWTSECRET="${GETH_AUTHRPC_JWTSECRET:-/tmp/jwt_secret.txt}"
 GENERATE_PASSWORD="${GENERATE_SECRET:-true}"
 
-sleep 300
-
 # Function to store the validator secret in a file
 function store_secret {
   if [[ "$(GENERATE_PASSWORD)" != "true" ]];
