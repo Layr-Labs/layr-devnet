@@ -35,6 +35,10 @@ common:
     name: "layr-devnet-jwt-secret"
     values:
       jwtSecret: ""
+  gethKeys:
+    name: "layr-devnet-geth-keys"
+    values:
+      default-account: ''
   gethPassword:
     name: "layr-devnet-geth-password"
     values:
@@ -79,6 +83,7 @@ geth:
     CONFIG_FILE: "/layr-devnet/consensus/config.yml"
     OUTPUT_SSZ: "/tmp/genesis.ssz"
     GENERATE_PASSWORD: "false"
+    KEYSTORE_SOURCE_DIR: "/geth/data/tmp-keystore"
   ports:
     http-rpc:
         containerPort: 8545
@@ -113,9 +118,15 @@ geth:
     - name: chain-config
       configMap:
           name: layr-devnet-chain-config
+    - name: geth-keys
+      secret:
+        secretName: layr-devnet-geth-keys
   volumeMounts:
     - name: geth-data
       mountPath: /geth
+    - name: geth-keys
+      mountPath: /geth/data/tmp-keystore
+      readOnly: true
     - name: jwt-secret
       mountPath: /geth-secrets/jwt-secret
       readOnly: true
