@@ -6,7 +6,12 @@ GENESIS_INPUT="${GENESIS_INPUT:-/execution/genesis.json}"
 GENESIS_OUTPUT="${GENESIS_OUTPUT:-/execution/genesis.json}"
 OUTPUT_SSZ="${OUTPUT_SSZ:-/consensus/genesis.ssz}"
 
-if [[ (-f $GENESIS_OUTPUT || -f $OUTPUT_SSZ) && $OVERWRITE == "false" ]]; then
+if [[ -f $GENESIS_OUTPUT && $OVERWRITE == "false" ]]; then
+    echo "Genesis file already exists. Set OVERWRITE=true to overwrite."
+    exit 0
+fi
+
+if [[ -f $OUTPUT_SSZ && $OVERWRITE == "false" ]]; then
     echo "Genesis file already exists. Set OVERWRITE=true to overwrite."
     exit 0
 fi

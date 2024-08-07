@@ -11,8 +11,8 @@ helm --kube-context=protocol-preprod upgrade --install \
     --wait  \
     --version=$(date +%s) \
     --namespace layr-devnet \
-    --set images.geth.tag="44f5975d9947e7a34a0639c76dd5e8af144145cb" \
-    --set images.prysm.tag="44f5975d9947e7a34a0639c76dd5e8af144145cb" \
+    --set images.geth.tag="9615ca83d36d11e28303d55825f2090daebead61" \
+    --set images.prysm.tag="9615ca83d36d11e28303d55825f2090daebead61" \
     --set 'common.jwtSecret.values.jwtSecret=b63545e10dad71fc76a95bc3ab9d7c525077b35896178a3501349ae2d7f9367c' \
     --set 'common.gethPassword.values.gethPassword=protractor accident backfire rebel 71' \
     --set common.secret.values.VALIDATOR_SECRET=some-validator-secret \
