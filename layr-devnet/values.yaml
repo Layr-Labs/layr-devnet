@@ -186,3 +186,44 @@ beaconChain:
         containerPort: 13000
         name: p2p
         protocol: TCP
+validator:
+  name: validator
+  image:
+    name: "767397703211.dkr.ecr.us-east-1.amazonaws.com/layr-devnet/beacon-chain"
+    tag: "latest"
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: .6
+    limits:
+      memory: 4Gi
+      cpu: 1
+  serviceAccountName: ""
+  nodeSelector:
+    node-role.kubernetes.io/general: general
+  env:
+    # runtime variables
+    DATA_DIR: "/validator-data"
+    BEACON_RPC_PROVIDER: "http://beacon-chain:3500"
+    CHAIN_CONFIG_FILE: "/config/config.yml"
+  volumeMounts:
+    - name: validator-data
+      mountPath: /validator-data
+    - name: chain-config
+      mountPath: /config
+  volumes:
+    - name: validator-data
+      persistentVolumeClaim:
+        claimName: validator-data
+    - name: chain-config
+      configMap:
+        name: layr-devnet-chain-config
+  ports:
+    rpc:
+      containerPort: 7000
+      name: json-rpc
+      protocol: TCP
+    grpc:
+      containerPort: 7500
+      name: grpc
+      protocol: TCP
