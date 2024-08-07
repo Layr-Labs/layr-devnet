@@ -204,7 +204,7 @@ validator:
   env:
     # runtime variables
     DATA_DIR: "/validator-data"
-    BEACON_RPC_PROVIDER: "http://beacon-chain:3500"
+    BEACON_RPC_PROVIDER: "beacon-chain:4000"
     CHAIN_CONFIG_FILE: "/config/config.yml"
   volumeMounts:
     - name: validator-data

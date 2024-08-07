@@ -14,4 +14,4 @@ spec:
 {{- end }}
   clusterIP: None
   selector:
-    serviceName: {{ .Values.beaconChain.name }}
+    app: {{ .Values.beaconChain.name }}

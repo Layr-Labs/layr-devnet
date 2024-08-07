@@ -27,7 +27,7 @@ spec:
 {{- end }}
 {{- $secretName := .Values.common.secret.name }}
       containers:
-        - name: beacon-chain
+        - name: validator
           image: {{ .Values.images.prysm.name }}:{{ .Values.images.prysm.tag }}
           imagePullPolicy: Always
           command:
@@ -68,7 +68,7 @@ spec:
 {{- end}}
   volumeClaimTemplates:
     - metadata:
-        name: beacon-chain-data
+        name: validator-data
       spec:
         accessModes:
           - ReadWriteMany

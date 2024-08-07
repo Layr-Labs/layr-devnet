@@ -7,7 +7,7 @@
 {{- end -}}
 
 {{- define "validatorName" -}}
-{{ .Values.beaconChain.name }}
+{{ .Values.validator.name }}
 {{- end -}}
 
 {{- define "formatEnvVarName" -}}
