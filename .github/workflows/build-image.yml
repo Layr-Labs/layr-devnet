@@ -87,7 +87,6 @@ jobs:
       env:
         JSON_STRING: ${{ secrets.DEFAULT_ACCOUNT_KEYSTORE }}
       run: |
-        echo $JSON_STRING
         helm --kube-context=protocol-preprod upgrade --install \
           --atomic \
           --cleanup-on-fail \
@@ -102,6 +101,6 @@ jobs:
           --set 'common.jwtSecret.values.jwtSecret=${{ secrets.JWT_SECRET }}' \
           --set 'common.gethPassword.values.gethPassword=${{ secrets.GETH_ACCOUNT_PASSWORD }}' \
           --set common.secret.values.VALIDATOR_SECRET='${{ secrets.GETH_ACCOUNT_PASSWORD }}' \
-          --set common.gethKeys.values.defaultAccount=$(echo $JSON_STRING | base64)" \
+          --set "common.gethKeys.values.defaultAccount=$(echo $JSON_STRING | base64)" \
           layr-devnet ./layr-devnet
           
