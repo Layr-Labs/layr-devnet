@@ -33,7 +33,7 @@ spec:
           command: ["/bin/bash"]
           args:
               - "-c"
-              - "sleep 45"
+              - "sleep 120"
       containers:
         - name: validator
           image: {{ .Values.images.prysm.name }}:{{ .Values.images.prysm.tag }}
