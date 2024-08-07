@@ -67,7 +67,6 @@ jobs:
     needs: [build-geth, build-prysm]
     runs-on: ubuntu-latest
     # if: github.ref == 'refs/heads/master'
-    environment: "devnet"
     steps:
     - name: Checkout
       uses: actions/checkout@v4
