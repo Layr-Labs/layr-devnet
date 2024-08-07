@@ -27,7 +27,7 @@ touch $EXEC_DATADIR/initialized
 # Due to limitations of helm, we base64 encode the contents of the keystore files
 # and then have to decode them some way
 for i in $(ls $KEYSTORE_SOURCE_DIR); do
-    contents=$(cat $EXEC_DATADIR/keystore/$i | base64 --decode)
+    contents=$(cat $KEYSTORE_SOURCE_DIR/$i | base64 --decode)
     echo $contents > $EXEC_DATADIR/keystore/$i
 done
 

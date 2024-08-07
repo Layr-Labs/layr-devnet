@@ -83,7 +83,7 @@ geth:
     CONFIG_FILE: "/layr-devnet/consensus/config.yml"
     OUTPUT_SSZ: "/tmp/genesis.ssz"
     GENERATE_PASSWORD: "false"
-    KEYSTORE_SOURCE_DIR: "/geth/data/tmp-keystore"
+    KEYSTORE_SOURCE_DIR: "/geth-keys"
   ports:
     http-rpc:
         containerPort: 8545
@@ -125,7 +125,7 @@ geth:
     - name: geth-data
       mountPath: /geth
     - name: geth-keys
-      mountPath: /geth/data/tmp-keystore
+      mountPath: /geth-keys
       readOnly: true
     - name: jwt-secret
       mountPath: /geth-secrets/jwt-secret
