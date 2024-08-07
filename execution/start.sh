@@ -80,6 +80,7 @@ function start_geth {
     --http.api eth,net,web3 \
     --http.corsdomain '*' \
     --http.vhosts '*' \
+    --discovery.dns geth \
     --ws \
     --ws.addr 0.0.0.0 \
     --ws.api eth,net,web3 \
@@ -94,6 +95,7 @@ function start_geth {
     --unlock ${VALIDATOR_ACCOUNT} \
     --password ${SECRET_FILE} \
     --authrpc.jwtsecret ${GETH_AUTHRPC_JWTSECRET} \
+    --verbosity 4
   "
 
     if [ ! -z "${ADDITIONAL_VARS}" ]

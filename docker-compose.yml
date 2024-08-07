@@ -2,7 +2,7 @@ services:
   create-beacon-chain-genesis:
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: ./prysm/Dockerfile
     command:
       - prysmctl
       - testnet
@@ -48,7 +48,7 @@ services:
       - ./execution/init.sh:/execution/init.sh
       - ./execution/start.sh:/execution/start.sh      
       - ./execution/genesis.json:/execution/genesis.json      
-      - ./execution/UTC--2024-07-25T20-16-28.065935964Z--6db1f3f7a368d5895256a5ba0bdb84d2a6c3bff7:/home/alice/geth-1/keystore/UTC--2024-07-25T20-16-28.065935964Z--6db1f3f7a368d5895256a5ba0bdb84d2a6c3bff7
+      - ./execution/validator-account-6db1f3f7a368d5895256a5ba0bdb84d2a6c3bff7.json:/home/alice/geth-1/keystore/validator-account-6db1f3f7a368d5895256a5ba0bdb84d2a6c3bff7.json
     networks:
       - devnet-net
     depends_on:
