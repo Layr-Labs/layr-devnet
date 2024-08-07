@@ -35,11 +35,7 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
           PLATFORMS: "linux/amd64"
         run: |
-          if [[ $GITHUB_REF == refs/heads/master ]]; then
-            docker buildx build --platform $PLATFORMS -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest --push -f ./go-ethereum/Dockerfile ./go-ethereum
-          else
-            docker buildx build --platform $PLATFORMS -t $REGISTRY/$REPOSITORY:$IMAGE_TAG --push .
-          fi
+          docker buildx build --platform $PLATFORMS -t $REGISTRY/$REPOSITORY:$IMAGE_TAG --push -f ./go-ethereum/Dockerfile .
   build-prysm:
     # needs: test
     runs-on: ubuntu-latest
@@ -66,15 +62,11 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
           PLATFORMS: "linux/amd64"
         run: |
-          if [[ $GITHUB_REF == refs/heads/master ]]; then
-            docker buildx build --platform $PLATFORMS -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest --push ./prysm/Dockerfile ./prysm
-          else
-            docker buildx build --platform $PLATFORMS -t $REGISTRY/$REPOSITORY:$IMAGE_TAG --push .
-          fi
+          docker buildx build --platform $PLATFORMS -t $REGISTRY/$REPOSITORY:$IMAGE_TAG --push ./prysm/Dockerfile .
   deploy:
     needs: [build-geth, build-prysm]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
+    # if: github.ref == 'refs/heads/master'
     environment: "devnet"
     steps:
     - name: Checkout
