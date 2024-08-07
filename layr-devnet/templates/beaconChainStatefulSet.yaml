@@ -54,7 +54,7 @@ spec:
           image: {{ .Values.images.prysm.name }}:{{ .Values.images.prysm.tag }}
           imagePullPolicy: Always
           command:
-            - "/layr-devnet/consensus/waitForGeth.sh"
+            - "/layr-devnet/consensus/checkGeth.sh"
           env:
 {{- if .Values.beaconChain.env }}
 {{- range $k, $v := .Values.beaconChain.env }}

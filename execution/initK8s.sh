@@ -31,5 +31,3 @@ for i in $(ls $KEYSTORE_SOURCE_DIR); do
     echo $contents > $EXEC_DATADIR/keystore/$i
 done
 
-
-sleep 300
