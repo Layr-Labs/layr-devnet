@@ -134,12 +134,6 @@ beaconChain:
   image:
     name: "767397703211.dkr.ecr.us-east-1.amazonaws.com/layr-devnet/beacon-chain"
     tag: "latest"
-  updateStrategy:
-    replicas: 1
-    strategy:
-      rollingUpdate:
-        maxUnavailable: 0
-        maxSurge: 1
   resources:
     requests:
       memory: 1Gi
@@ -147,7 +141,36 @@ beaconChain:
     limits:
       memory: 4Gi
       cpu: 1
-  serviceAccountName: "layr-devnet-pods"
-  nodeSelector: {}
-  env: {}
+  serviceAccountName: ""
+  nodeSelector:
+    node-role.kubernetes.io/general: general
+  env:
+    # init genesis variables
+    CONFIG_FILE: "/layr-devnet/consensus/config.yml"
+    GENESIS_INPUT: "/layr-devnet/execution/genesis.json"
+    GENESIS_OUTPUT: "/tmp/genesis.json"
+    OUTPUT_SSZ: "/beacon-chain/genesis.ssz"
+    # runtime variables
+    DATA_DIR: "/beacon-chain/beacon-chain"
+    SLASHER_DIR: "/beacon-chain/slasher"
+    GENESIS_FILE: "/beacon-chain/genesis.ssz"
+    CHAIN_CONFIG_FILE: "/config/config.yml"
+    JWT_SECRET: "/beacon-chain-secrets/jwt-secret/jwtSecret"
+  volumeMounts:
+    - name: jwt-secret
+      mountPath: /beacon-chain-secrets/jwt-secret
+    - name: beacon-chain-data
+      mountPath: /beacon-chain
+    - name: chain-config
+      mountPath: /config
+  volumes:
+    - name: beacon-chain-data
+      persistentVolumeClaim:
+        claimName: beacon-chain-data
+    - name: jwt-secret
+      secret:
+        secretName: layr-devnet-jwt-secret
+    - name: chain-config
+      configMap:
+        name: layr-devnet-chain-config
 
