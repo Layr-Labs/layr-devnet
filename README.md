@@ -14,40 +14,101 @@ These scripts work well on the latest version of Docker
 
 ### Geting Started
 
-#### Local Installation
+#### All Profiles - Setup
 
 1\. Copy `env.example` to .env
+  Make a note especially of DATA_VOLUME variable and make sure this points at the local storage or data volume intended
 
-2\. Set VALIDATOR_PRIVATE to appropriate validator private key
-    Make sure that private key corresponds to 'unlock address' used by execution client.  This is specified in `docker-compose.yml` and in `execution/genesis.json`
+2\. Set VALIDATOR_SECRET to the password for the validator account
 
-3\. Set VALIDATOR_SECRET to something suitably secure.  
+3\. build the setup profile
 
-4\. Clean existing docker installation
+```bash
+    $ docker compose --profile setup build
+```
+
+4\. execute the setup profile to create the genesis files
+  This will store the genesis files for the environment in the appropriate locations.
+
+```bash
+    $ docker compose --profile setup run create-beacon-chain-genesis
+```
+
+#### Local Installation
+
+1\. Clean existing docker installation
 
 ```bash
     $ docker compose down --volumes
 ```
 
-5\. Build container system
+2\. Build container system
 
 ```bash
     $ docker compose build
 ```
 
-6\. Bootstrap system
+3\. Bootstrap system
 
 ```bash
     $ docker compose up
 ```
 
-##
+## local deployment RPC_URL
 RPC_URL=http://localhost:8545
 
-### Validator Account
+#### Deploy to Remote context (AWS EC2)
 
-#### Address: 0x6db1f3f7a368d5895256a5ba0bdb84d2a6c3bff7
+1\. Create remote context for EC2
 
-Key available from maintainer
+```bash
+   $ docker context create devnet-remote --docker "host=ssh://ubuntu@XX.XX.XX.XX"
+```
 
-Funds available: 20000 ETH
+2\. Clean existing docker installation
+
+```bash
+    $ docker -c devnet-remote compose down --volumes
+```
+
+3\. Build container system
+
+```bash
+    $ docker -c devnet-remote compose build
+```
+
+4\. Bootstrap system
+  Check the environment variable `DATA_VOLUME`.  Make sure this is set to the location of the storage on the remote context.   For example `DATA_VOLUME=/storage`
+
+```bash
+    $ docker -c devnet-remote  compose up -d
+```
+
+5\. Check services on the remote system
+
+```bash
+    $ docker -c devenet-remote ps
+```
+
+6\. Follow the logs on the remote context
+
+```bash
+    $ docker compose -c devnet-remote logs -f
+```    
+
+#### Deploy to ECS
+
+1\. Create docker context for ECS
+
+```bash
+$ docker context create ecs layr-devnet-ecs
+```
+
+
+### Important Account Information
+
+| Account                                    | Name              | Funds     | Description                          |
+| ------------------------------------------ | ----------------- | --------- | ------------------------------------ |
+| 0x6db1f3f7a368d5895256a5ba0bdb84d2a6c3bff7 | Validator Account | 20000 ETH | Suggested fee recipient              |
+| 0xbb422b2e8cac43a908764a8d3d225392c8e855a9 | Faucet Account    | 20000 ETH | used to distribute funds for testing |
+| 0x4a3Ee341f8ceEdB790F511A18899fBC1fdEb35af | Deployer Account  | 100 ETH   | deployer admin used for deployments  |

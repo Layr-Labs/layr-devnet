@@ -38,6 +38,14 @@ function geth_genesis {
 }
 
 # fixup docker mount perms
+sudo mkdir -p ${EXEC_DATADIR}
 sudo chown -R alice:alice ${EXEC_DATADIR}
+echo Removing exec datadir
 remove_db
+echo Init geth genesis
 geth_genesis
+
+# setup keystore
+echo Initialize keystore
+sudo mkdir -p ${EXEC_DATADIR}/keystore
+sudo cp -fv /execution/UTC--* ${EXEC_DATADIR}/keystore/

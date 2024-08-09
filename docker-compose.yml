@@ -1,131 +1,120 @@
 services:
-  create-beacon-chain-genesis:
-    build:
-      context: ./prysm
-      dockerfile: Dockerfile
-    command:
-      - prysmctl
-      - testnet
-      - generate-genesis
-      - --fork=capella
-      - --num-validators=64
-      - --genesis-time-delay=15
-      - --output-ssz=/consensus/genesis.ssz
-      - --chain-config-file=/consensus/config.yml
-      - --geth-genesis-json-in=/execution/genesis.json
-      - --geth-genesis-json-out=/execution/genesis.json
-    volumes:
-      - ./consensus:/consensus
-      - ./execution:/execution
-  geth:
-    command:
-      - bash
-      - -c
-      - |
-        echo init execution client &&
-        bash /execution/init.sh &&
-        echo starting geth &&
-        bash /execution/start.sh
-    environment:
-        VALIDATOR_SECRET:  ${VALIDATOR_SECRET}
-        VALIDATOR_ACCOUNT: 0x6db1f3f7a368d5895256a5ba0bdb84d2a6c3bff7
-        EXEC_DATADIR: /home/alice/geth-1
-    user: alice
-    build:
-      context: ./go-ethereum
-      dockerfile: Dockerfile
-      args:
-        HTTP_PORT: 8545
-    ports:
-      - "8545:8545"
-      - "8546:8546"
-      - "8551:8551"
-      - "30303:30303"
-      - "30303:30303/udp"
-    volumes:
-      - geth-data:/home/alice
-      - ./execution:/execution
-      - ./execution/init.sh:/execution/init.sh
-      - ./execution/start.sh:/execution/start.sh      
-      - ./execution/genesis.json:/execution/genesis.json      
-      - ./execution/UTC--2024-07-25T20-16-28.065935964Z--6db1f3f7a368d5895256a5ba0bdb84d2a6c3bff7:/home/alice/geth-1/keystore/UTC--2024-07-25T20-16-28.065935964Z--6db1f3f7a368d5895256a5ba0bdb84d2a6c3bff7
-    networks:
-      - devnet-net
-    depends_on:
-      create-beacon-chain-genesis:
-        condition: service_completed_successfully
-  beacon-chain:
-    command:
-      - beacon-chain
-      - --execution-endpoint=http://geth:8551
-      - --datadir=/home/victor/beacon-chain
-      - --slasher-datadir=/home/victor/slasher
-      - --genesis-state=/consensus/genesis.ssz
-      - --interop-eth1data-votes
-      - --chain-config-file=/consensus/config.yml
-      - --contract-deployment-block=0
-      - --chain-id=11155151
-      - --accept-terms-of-use
-      - --grpc-gateway-corsdomain=*
-      - --grpc-gateway-host=0.0.0.0
-      - --rpc-host=0.0.0.0
-      - --jwt-secret=/home/alice/geth-1/geth/jwtsecret
-      - --suggested-fee-recipient=0x123463a4B065722E99115D6c222f267d9cABb524
-      - --bootstrap-node=0
-      - --min-sync-peers=0
-      - --minimum-peers-per-subnet=0
-      - --enable-debug-rpc-endpoints
-      - --verbosity=warn
-    user: victor
-    build:
-      context: ./prysm
-      dockerfile: Dockerfile
-    ports:
-      - "3500:3500"
-      - "4000:4000"
-      - "13000:13000"      
-    volumes:
-      - ./consensus:/consensus
-      - prysm-data:/home/victor
-      - geth-data:/home/alice    
-    networks:
-      - devnet-net
-    depends_on:
-      create-beacon-chain-genesis:
-        condition: service_completed_successfully
-      geth:
-        condition: service_healthy
-  validator:
-    command:
-      - validator
-      - --datadir=/home/victor/validator-1
-      - --beacon-rpc-provider=beacon-chain:4000
-      - --accept-terms-of-use
-      - --interop-num-validators=64
-      - --interop-start-index=0
-      - --chain-config-file=/consensus/config.yml
-      - --verbosity=warn
-    user: victor
-    build:
-      context: ./prysm
-      dockerfile: Dockerfile
-    ports:
-      - "7000:7000"
-      - "7500:7500"
-    volumes:
-      - ./consensus:/consensus      
-      - prysm-data:/home/victor
-      - geth-data:/home/alice      
-    networks:
-      - devnet-net
-    depends_on:
-      geth:
-        condition: service_healthy
-      beacon-chain:
-        condition: service_started
+    create-beacon-chain-genesis:
+        build:
+            context: .
+            dockerfile: ./prysm/Dockerfile
+        command:
+            - prysmctl
+            - testnet
+            - generate-genesis
+            - --fork=capella
+            - --num-validators=64
+            - --genesis-time-delay=15
+            - --output-ssz=/consensus/genesis.ssz
+            - --chain-config-file=/consensus/config.yml
+            - --geth-genesis-json-in=/execution/genesis.json
+            - --geth-genesis-json-out=/execution/genesis.json
+        volumes:
+            - ./consensus:/consensus
+            - ./execution:/execution
+        profiles:
+            - setup
+    geth:
+        command:
+            - bash
+            - -c
+            - |
+                bash /execution/init.sh &&
+                echo starting geth &&
+                bash /execution/start.sh
+        environment:
+            VALIDATOR_SECRET: ${VALIDATOR_SECRET}
+            VALIDATOR_ACCOUNT: 0x6db1f3f7a368d5895256a5ba0bdb84d2a6c3bff7
+            EXEC_DATADIR: /home/alice/geth-1
+        user: alice
+        build:
+            context: .
+            dockerfile: ./go-ethereum/Dockerfile
+            args:
+                HTTP_PORT: 8545
+        ports:
+            - '8545:8545'
+            - '8546:8546'
+            - '8551:8551'
+            - '30303:30303'
+            - '30303:30303/udp'
+        volumes:
+            - ${DATA_VOLUME:-node-data}:/home/alice
+        networks:
+            - devnet-net
+    beacon-chain:
+        command:
+            - beacon-chain
+            - --force-clear-db
+            - --execution-endpoint=http://geth:8551
+            - --datadir=/home/victor/beacon-chain
+            - --slasher-datadir=/home/victor/slasher
+            - --genesis-state=/consensus/genesis.ssz
+            - --interop-eth1data-votes
+            - --chain-config-file=/consensus/config.yml
+            - --contract-deployment-block=0
+            - --chain-id=11155151
+            - --accept-terms-of-use
+            - --grpc-gateway-corsdomain=*
+            - --grpc-gateway-host=0.0.0.0
+            - --rpc-host=0.0.0.0
+            - --jwt-secret=/home/alice/geth-1/geth/jwtsecret
+            - --suggested-fee-recipient=0x6db1f3f7a368d5895256a5ba0bdb84d2a6c3bff7
+            - --bootstrap-node=0
+            - --min-sync-peers=0
+            - --minimum-peers-per-subnet=0
+            - --enable-debug-rpc-endpoints
+            - --verbosity=warn
+        user: victor
+        build:
+            context: .
+            dockerfile: ./prysm/Dockerfile
+        ports:
+            - '3500:3500'
+            - '4000:4000'
+            - '13000:13000'
+        volumes:
+            - ${DATA_VOLUME:-node-data}:/home/victor
+            - ${DATA_VOLUME:-node-data}:/home/alice
+        networks:
+            - devnet-net
+        depends_on:
+            geth:
+                condition: service_healthy
+    validator:
+        command:
+            - validator
+            - --datadir=/home/victor/validator-1
+            - --beacon-rpc-provider=beacon-chain:4000
+            - --accept-terms-of-use
+            - --interop-num-validators=64
+            - --interop-start-index=0
+            - --chain-config-file=/consensus/config.yml
+            - --verbosity=warn
+        user: victor
+        build:
+            context: .
+            dockerfile: ./prysm/Dockerfile
+        ports:
+            - '7000:7000'
+            - '7500:7500'
+        volumes:
+            - ${DATA_VOLUME:-node-data}:/home/victor
+            - ${DATA_VOLUME:-node-data}:/home/alice
+        networks:
+            - devnet-net
+        depends_on:
+            geth:
+                condition: service_healthy
+            beacon-chain:
+                condition: service_started
 volumes:
-  geth-data:
-  prysm-data:
+    node-data:
 networks:
-  devnet-net:
-    driver: bridge
+    devnet-net:
+        driver: bridge

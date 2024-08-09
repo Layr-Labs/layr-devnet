@@ -47,7 +47,10 @@ COPY --from=go-builder /usr/local/bin/beacon-chain /usr/local/bin/beacon-chain
 COPY --from=go-builder /usr/local/bin/validator /usr/local/bin/validator
 COPY --from=go-builder /usr/local/bin/prysmctl /usr/local/bin/prysmctl
 
-RUN useradd --create-home -s /bin/bash -u 1001 -U victor
+COPY --chown=victor:victor ./consensus /consensus
+RUN chmod 644 /consensus/genesis.ssz
+
+RUN useradd --create-home -s /bin/bash -u 2001 -U victor
 RUN usermod -a -G sudo victor
 RUN echo '%victor ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
