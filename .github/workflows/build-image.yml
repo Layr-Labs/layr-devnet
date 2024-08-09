@@ -1,5 +1,4 @@
 name: Docker Build CI
-
 on:
   workflow_dispatch:
   pull_request:
@@ -7,23 +6,26 @@ on:
       - main
   push:
     branches:
-      - "*"
+      - '*'
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v3
-      -
-        name: Set up QEMU
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
-      -
-        name: Set up Docker Buildx
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      -
-        name: Build
+      - name: Build genesis
         run: |
-             COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose build
-             
-          
+          docker compose --profile setup build
+        env:
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          DOCKER_BUILDKIT: 1
+      - name: Build execution and consensus clients
+        run: |
+          docker compose build
+        env:
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          DOCKER_BUILDKIT: 1

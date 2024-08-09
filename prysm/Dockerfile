@@ -24,7 +24,7 @@ ENV PATH=$PATH:/usr/local/go/bin
 RUN go version
 
 # Prysm
-RUN git clone --branch v5.0.3 https://github.com/prysmaticlabs/prysm /prysm
+RUN git clone --quiet --branch v5.0.3 https://github.com/prysmaticlabs/prysm /prysm
 WORKDIR /prysm
 RUN go build -ldflags="-s -w" -o=/usr/local/bin/beacon-chain ./cmd/beacon-chain
 RUN go build -ldflags="-s -w" -o=/usr/local/bin/validator ./cmd/validator
@@ -47,8 +47,9 @@ COPY --from=go-builder /usr/local/bin/beacon-chain /usr/local/bin/beacon-chain
 COPY --from=go-builder /usr/local/bin/validator /usr/local/bin/validator
 COPY --from=go-builder /usr/local/bin/prysmctl /usr/local/bin/prysmctl
 
+# requires setup profile build
 COPY --chown=victor:victor ./consensus /consensus
-RUN chmod 644 /consensus/genesis.ssz
+RUN if [ -f /consensus/genesis.ssz ]; then chmod 644 /consensus/genesis.ssz; fi
 
 RUN useradd --create-home -s /bin/bash -u 2001 -U victor
 RUN usermod -a -G sudo victor
