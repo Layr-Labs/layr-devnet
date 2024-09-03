@@ -109,6 +109,13 @@ $ docker context create ecs layr-devnet-ecs
 
 | Account                                    | Name              | Funds     | Description                          |
 | ------------------------------------------ | ----------------- | --------- | ------------------------------------ |
-| 0x6db1f3f7a368d5895256a5ba0bdb84d2a6c3bff7 | Validator Account | 20000 ETH | Suggested fee recipient              |
+| 0x6DB1F3F7a368d5895256A5BA0bdB84d2a6C3bFF7 | Validator Account | 20000 ETH | Suggested fee recipient              |
 | 0xbb422b2e8cac43a908764a8d3d225392c8e855a9 | Faucet Account    | 20000 ETH | used to distribute funds for testing |
 | 0x4a3Ee341f8ceEdB790F511A18899fBC1fdEb35af | Deployer Account  | 100 ETH   | deployer admin used for deployments  |
+
+## Tests
+Test that the beacon node is running
+- `curl http://localhost:3500/eth/v1/beacon/genesis`
+
+Test that the geth node is running
+- `curl http://localhost:8545 -X POST -H "Content-Type: application/json" --data '{"method":"eth_chainId","params":[],"id":1,"jsonrpc":"2.0"}'`

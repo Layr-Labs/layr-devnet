@@ -2,7 +2,7 @@
 
 set -e
 
-GENESIS_FILE=/execution/genesis.json
+GENESIS_FILE=/shared/genesis.json
 
 function remove_db {
     if [ -z "${EXEC_DATADIR}" ]
@@ -39,7 +39,6 @@ function geth_genesis {
 
 # fixup docker mount perms
 sudo mkdir -p ${EXEC_DATADIR}
-sudo chown -R alice:alice ${EXEC_DATADIR}
 echo Removing exec datadir
 remove_db
 echo Init geth genesis

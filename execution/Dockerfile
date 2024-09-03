@@ -9,11 +9,11 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
   apt clean && \
     rm -rf /var/lib/apt/lists/*
 
-COPY ./go-ethereum/install-geth.sh /go-ethereum/install-geth.sh
+COPY ./execution/install-geth.sh /execution/install-geth.sh
 COPY ./execution /execution
 
-WORKDIR /go-ethereum
-RUN /go-ethereum/install-geth.sh
+WORKDIR /execution
+RUN /execution/install-geth.sh
 
 RUN useradd --create-home -s /bin/bash -u 2001 -U alice
 RUN usermod -a -G sudo alice
