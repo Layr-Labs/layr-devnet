@@ -143,6 +143,7 @@ services:
       - |
         source ~/.bashrc && make deploy-eigen && \
         mv ./contracts/broadcast/Deploy_From_Scratch.s.sol/11155151/run-latest.json /shared/contracts.json &&
+        mv ./contracts/script/output/eigenpods.json /shared/eigenpods.json &&
         cat /shared/contracts.json && \
         tail -f /dev/null
     healthcheck:
