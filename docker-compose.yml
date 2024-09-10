@@ -2,24 +2,30 @@ services:
   create-beacon-chain-genesis:
     build:
       context: .
-      dockerfile: ./prysm/Dockerfile
-    command:
-      - prysmctl
-      - testnet
-      - generate-genesis
-      - --fork=capella
-      - --num-validators=64
-      - --genesis-time-delay=15
-      - --output-ssz=/consensus/genesis.ssz
-      - --chain-config-file=/consensus/config.yml
-      - --geth-genesis-json-in=/execution/genesis.json
-      - --geth-genesis-json-out=/execution/genesis.json
+      dockerfile: ./consensus/Dockerfile
+    user: root
+    entrypoint:
+      - sh
+      - -c
+      - |
+        prysmctl testnet generate-genesis --fork=capella --num-validators=64 --genesis-time-delay=15 \
+        --output-ssz=/shared/genesis.ssz --chain-config-file=/consensus/config.yml \
+        --geth-genesis-json-in=/execution/genesis.json --geth-genesis-json-out=/shared/genesis.json && \
+        echo "Genesis generated, keeping container running..." && tail -f /dev/null
     volumes:
+      - ${DATA_VOLUME:-node-data}:/home/alice
       - ./consensus:/consensus
       - ./execution:/execution
-    profiles:
-      - setup
+      - shared-data:/shared
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /shared/genesis.json && echo 'ok'"]
+      interval: 5s
+      retries: 5
+      start_period: 5s
   geth:
+    depends_on:
+      create-beacon-chain-genesis:
+        condition: service_healthy
     command:
       - bash
       - -c
@@ -29,12 +35,12 @@ services:
         bash /execution/start.sh
     environment:
       VALIDATOR_SECRET: ${VALIDATOR_SECRET}
-      VALIDATOR_ACCOUNT: 0x6db1f3f7a368d5895256a5ba0bdb84d2a6c3bff7
+      VALIDATOR_ACCOUNT: 0x6DB1F3F7a368d5895256A5BA0bdB84d2a6C3bFF7
       EXEC_DATADIR: /home/alice/geth-1
-    user: alice
+    user: root
     build:
       context: .
-      dockerfile: ./go-ethereum/Dockerfile
+      dockerfile: ./execution/Dockerfile
       args:
         HTTP_PORT: 8545
     ports:
@@ -45,8 +51,14 @@ services:
       - '30303:30303/udp'
     volumes:
       - ${DATA_VOLUME:-node-data}:/home/alice
+      - shared-data:/shared
     networks:
       - devnet-net
+    healthcheck:
+      test: ["CMD", "curl", "http://localhost:8545", "-X", "POST", "-H", "Content-Type: application/json", "--data", "{\"method\":\"eth_chainId\",\"params\":[],\"id\":1,\"jsonrpc\":\"2.0\"}"]
+      interval: 5s
+      retries: 5
+      start_period: 5s
   beacon-chain:
     command:
       - beacon-chain
@@ -54,7 +66,7 @@ services:
       - --execution-endpoint=http://geth:8551
       - --datadir=/home/victor/beacon-chain
       - --slasher-datadir=/home/victor/slasher
-      - --genesis-state=/consensus/genesis.ssz
+      - --genesis-state=/shared/genesis.ssz
       - --interop-eth1data-votes
       - --chain-config-file=/consensus/config.yml
       - --contract-deployment-block=0
@@ -64,16 +76,21 @@ services:
       - --grpc-gateway-host=0.0.0.0
       - --rpc-host=0.0.0.0
       - --jwt-secret=/home/alice/geth-1/geth/jwtsecret
-      - --suggested-fee-recipient=0x6db1f3f7a368d5895256a5ba0bdb84d2a6c3bff7
+      - --suggested-fee-recipient=0x6DB1F3F7a368d5895256A5BA0bdB84d2a6C3bFF7
       - --bootstrap-node=0
       - --min-sync-peers=0
       - --minimum-peers-per-subnet=0
       - --enable-debug-rpc-endpoints
       - --verbosity=warn
-    user: victor
+    user: root
     build:
       context: .
-      dockerfile: ./prysm/Dockerfile
+      dockerfile: ./consensus/Dockerfile
+    healthcheck:
+      test: ["CMD", "curl", "http://localhost:3500/eth/v1/beacon/genesis"]
+      interval: 5s
+      retries: 5
+      start_period: 5s
     ports:
       - '3500:3500'
       - '4000:4000'
@@ -81,9 +98,12 @@ services:
     volumes:
       - ${DATA_VOLUME:-node-data}:/home/victor
       - ${DATA_VOLUME:-node-data}:/home/alice
+      - shared-data:/shared
     networks:
       - devnet-net
     depends_on:
+      create-beacon-chain-genesis:
+        condition: service_healthy
       geth:
         condition: service_healthy
   validator:
@@ -96,12 +116,12 @@ services:
       - --interop-start-index=0
       - --chain-config-file=/consensus/config.yml
       - --verbosity=warn
-    user: victor
+    user: root
     build:
       context: .
-      dockerfile: ./prysm/Dockerfile
+      dockerfile: ./consensus/Dockerfile
     ports:
-      - '7000:7000'
+      - '7001:7000'
       - '7500:7500'
     volumes:
       - ${DATA_VOLUME:-node-data}:/home/victor
@@ -113,8 +133,41 @@ services:
         condition: service_healthy
       beacon-chain:
         condition: service_started
+  eigen-deploy:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.deployer
+    command:
+      - bash
+      - -c
+      - |
+        source ~/.bashrc && make deploy-eigen && \
+        mv ./contracts/broadcast/Deploy_From_Scratch.s.sol/11155151/run-latest.json /shared/contracts.json &&
+        mv ./contracts/script/output/eigenpods.json /shared/eigenpods.json &&
+        cat /shared/contracts.json && \
+        tail -f /dev/null
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /shared/contracts.json && echo 'ok'"]
+      interval: 5s
+      retries: 30
+      start_period: 5s
+    volumes:
+      - shared-data:/shared
+      - ./consensus:/consensus
+      - ./execution:/execution
+    depends_on:
+      geth:
+        condition: service_healthy
+      beacon-chain:
+        condition: service_healthy
+    environment:
+      - PRIVATE_KEY
+      - RPC_URL="http://geth:8545"
+    networks:
+      - devnet-net
 volumes:
   node-data:
+  shared-data:
 networks:
   devnet-net:
     driver: bridge

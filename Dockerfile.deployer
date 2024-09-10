@@ -1,0 +1,20 @@
+# Dockerfile
+FROM rust:1-bullseye
+
+SHELL ["/bin/bash", "-c"]
+
+# Copy all your files into the image (adjust source and target as needed)
+COPY . /app
+
+# Set the working directory
+WORKDIR /app
+
+# Add any additional setup commands you need here, such as installing dependencies
+RUN apt-get update && apt-get install -y make git curl libc6  
+
+# install foundry
+RUN curl -L https://foundry.paradigm.xyz | bash
+RUN source ~/.bashrc
+ENV PATH="~/.foundry/bin:${PATH}"
+RUN foundryup
+RUN forge --version
